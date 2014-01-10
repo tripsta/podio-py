@@ -154,3 +154,12 @@ def test_delete():
                                          'DELETE',
                                          body=None,
                                          headers={})
+
+
+def test_find_by_app_item_id():
+    app_id = 1
+    item_id = 2
+
+    client, check_assertions = check_client_method()
+    result = client.Item.find_by_app_item_id(app_id, item_id)
+    check_assertions(result, 'GET', '/app/%d/item/%d' % (app_id, item_id))

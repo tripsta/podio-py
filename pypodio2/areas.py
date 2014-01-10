@@ -54,6 +54,9 @@ class Item(Area):
     def find_all_by_external_id(self, app_id, external_id):
         return self.transport.GET(url='/item/app/%d/v2/?external_id=%r' % (app_id, external_id))
 
+    def find_by_app_item_id(self, app_id, app_item_id):
+        return self.transport.GET(url='/app/%d/item/%d' % (app_id, app_item_id))
+
     def revisions(self, item_id):
         return self.transport.GET(url='/item/%d/revision/' % item_id)
 
@@ -148,6 +151,9 @@ class Application(Area):
             Python dict of JSON response
         '''
         return self.transport.GET(url='/app/%s' % app_id)
+
+    def find_by_org_space_and_app_labels(self, org_label, space_label, app_label):
+      return self.transport.GET(url='/app/org/%s/space/%s/%s' % (org_label, space_label, app_label))
 
     def dependencies(self, app_id):
         '''
@@ -505,3 +511,14 @@ class Files(Area):
         
         return self.transport.POST(url='/file/v2/', body=attributes,
                                    type='multipart/form-data')
+
+class Comment(Area):
+    def __init__(self, *args, **kwargs):
+        super(Comment, self).__init__(*args, **kwargs)
+
+    def create(self, commentable_type, commentable_id, attributes):
+        if type(attributes) != dict:
+            return ApiErrorException('Must be of type dict')
+        attributes = json.dumps(attributes)
+        return self.transport.POST(url='/comment/%s/%d' % (commentable_type, commentable_id,), body=attributes,
+                                   type='application/json')
